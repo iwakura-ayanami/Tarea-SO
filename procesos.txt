@@ -1,7 +1,7 @@
 nombre, tamaño, Unidad de Medida, tiempo de acceso, tiempo de tranferencia, tiempo de ejecución 
-ejemplo1|1000|K|1000|1000|1000
-ejemplo2|1000|K|1000|1000|1000
-ejemplo3|1000|K|1000|1000|1000
-ejemplo4|1000|K|1000|1000|1000
-ejemplo5|1000|K|1000|1000|1000
-ejemplo6|1000|K|1000|1000|1000
+p1|450166|B|8|12|
+p2|1000|K|1000|1000|1000
+p3|1000|K|1000|1000|1000
+p4|1000|K|1000|1000|1000
+p5|1000|K|1000|1000|1000
+p6|1000|K|1000|1000|1000

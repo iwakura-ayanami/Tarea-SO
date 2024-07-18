@@ -5,8 +5,8 @@
 #include <string>
 
 
-const unsigned long TAMANO_BLOQUE = 512;
-const unsigned long TAMANO_RAM = 2 * 1024 * 1024; // 2 MB
+const unsigned long TAMANO_BLOQUE = 2048;
+const unsigned long TAMANO_RAM = 8 * 1024 * 1024; // 2 MB
 
 
 struct Proceso {
