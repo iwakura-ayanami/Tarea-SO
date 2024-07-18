@@ -3,12 +3,10 @@
 #include <vector>
 #include <cmath>
 
-using namespace std;
-
 struct Proceso {
-    string nombre;
+    std::string nombre;
     double tamano;
-    string unidad;
+    std::string unidad;
     int tiempoAcceso;
     int tiempoTransferencia;
     int tiempoEjecucion;
@@ -17,7 +15,7 @@ struct Proceso {
     int turnaroundTime;
 };
 
-double convertirABytes(double tamano, string unidad) {
+double convertirABytes(double tamano, std::string unidad) {
     if (unidad == "B") return tamano;
     if (unidad == "KB") return tamano * 1024;
     if (unidad == "MB") return tamano * 1024 * 1024;
@@ -26,23 +24,28 @@ double convertirABytes(double tamano, string unidad) {
 }
 
 int calcularNumeroPaginas(double tamanoBytes, int tamanoBloque) {
-    return ceil(tamanoBytes / tamanoBloque);
+    return std::ceil(tamanoBytes / tamanoBloque);
 }
 
-void distribucionProporcional(vector<Proceso>& procesos, int memoriaTotal) {
+void distribucionProporcional(std::vector<Proceso>& procesos, int memoriaTotal, int tamanoBloque) {
     int totalPaginas = 0;
     for (auto& p : procesos) {
         totalPaginas += p.numPaginas;
     }
     
+    int paginasDisponibles = memoriaTotal / tamanoBloque;
+    
     for (auto& p : procesos) {
         double proporcion = (double)p.numPaginas / totalPaginas;
-        p.numPaginas = round(proporcion * (memoriaTotal / 512));
+        p.numPaginas = std::round(proporcion * paginasDisponibles);
     }
 }
 
-int calcularTiempoFallas(Proceso& p) {
-    return p.numPaginas * (p.tiempoAcceso + p.tiempoTransferencia);
+int calcularTiempoFallas(Proceso& p, int tamanoRAM, int tamanoBloque) {
+    int paginasRAM = tamanoRAM / tamanoBloque;
+    double probabilidadFallo = (double)(p.numPaginas - paginasRAM) / p.numPaginas;
+    if (probabilidadFallo < 0) probabilidadFallo = 0;
+    return std::round(p.numPaginas * probabilidadFallo * (p.tiempoAcceso + p.tiempoTransferencia));
 }
 
 int calcularTurnaroundTime(Proceso& p) {
@@ -54,32 +57,32 @@ int main() {
     const int BLOCK_SIZE = 512; // bytes
     const int MAX_PROCESOS = 6;
     
-    vector<Proceso> procesos;
+    std::vector<Proceso> procesos;
     
     int numProcesos;
-    cout << "Ingrese el número de procesos (máximo 6): ";
-    cin >> numProcesos;
+    std::cout << "Ingrese el número de procesos (máximo 6): ";
+    std::cin >> numProcesos;
     
     if (numProcesos > MAX_PROCESOS) {
-        cout << "Número de procesos excede el máximo permitido." << endl;
+        std::cout << "Número de procesos excede el máximo permitido." << std::endl;
         return 1;
     }
     
     for (int i = 0; i < numProcesos; i++) {
         Proceso p;
-        cout << "\nProceso " << i+1 << ":" << endl;
-        cout << "Nombre: ";
-        cin >> p.nombre;
-        cout << "Tamaño: ";
-        cin >> p.tamano;
-        cout << "Unidad (B/KB/MB/GB): ";
-        cin >> p.unidad;
-        cout << "Tiempo de acceso (ms): ";
-        cin >> p.tiempoAcceso;
-        cout << "Tiempo de transferencia (ms): ";
-        cin >> p.tiempoTransferencia;
-        cout << "Tiempo promedio de ejecución (ms): ";
-        cin >> p.tiempoEjecucion;
+        std::cout << "\nProceso " << i+1 << ":" << std::endl;
+        std::cout << "Nombre: ";
+        std::cin >> p.nombre;
+        std::cout << "Tamaño: ";
+        std::cin >> p.tamano;
+        std::cout << "Unidad (B/KB/MB/GB): ";
+        std::cin >> p.unidad;
+        std::cout << "Tiempo de acceso (ms): ";
+        std::cin >> p.tiempoAcceso;
+        std::cout << "Tiempo de transferencia (ms): ";
+        std::cin >> p.tiempoTransferencia;
+        std::cout << "Tiempo promedio de ejecución (ms): ";
+        std::cin >> p.tiempoEjecucion;
         
         double tamanoBytes = convertirABytes(p.tamano, p.unidad);
         p.numPaginas = calcularNumeroPaginas(tamanoBytes, BLOCK_SIZE);
@@ -87,19 +90,20 @@ int main() {
         procesos.push_back(p);
     }
     
-    distribucionProporcional(procesos, RAM_SIZE);
+    distribucionProporcional(procesos, RAM_SIZE, BLOCK_SIZE);
     
     for (auto& p : procesos) {
-        p.tiempoFallas = calcularTiempoFallas(p);
+        p.tiempoFallas = calcularTiempoFallas(p, RAM_SIZE, BLOCK_SIZE);
         p.turnaroundTime = calcularTurnaroundTime(p);
     }
     
-    cout << "\nResultados:" << endl;
+    std::cout << "\nResultados:" << std::endl;
     for (const auto& p : procesos) {
-        cout << "Proceso: " << p.nombre << endl;
-        cout << "Tiempo de Fallas: " << p.tiempoFallas << " ms" << endl;
-        cout << "TurnaRound Time: " << p.turnaroundTime << " ms" << endl;
-        cout << endl;
+        std::cout << "Proceso: " << p.nombre << std::endl;
+        std::cout << "Número de páginas: " << p.numPaginas << std::endl;
+        std::cout << "Tiempo de Fallas: " << p.tiempoFallas << " ms" << std::endl;
+        std::cout << "TurnaRound Time: " << p.turnaroundTime << " ms" << std::endl;
+        std::cout << std::endl;
     }
     
     return 0;
