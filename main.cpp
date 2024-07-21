@@ -196,7 +196,7 @@ void calcularTiempos() {
            CalcularCargasDescargas(p.numPaginas, p.marcosAsignados, a, b);
            p.tiempoFallas = ((p.marcosAsignados * a) + (b*2)) * (p.tiempoAcceso + p.tiempoTransferencia);
           }
-        p.turnaroundTime = p.tiempoFallas + p.tiempoEjecucion;
+        p.turnaroundTime = p.tiempoFallas + (p.tiempoEjecucion*p.numPaginas);
     }
 }
 
