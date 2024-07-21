@@ -181,13 +181,25 @@ void ingresar_desde_archivo(std::vector<Proceso>& procesos, int num){
     read.close();
 }
 
-
+void CalcularCargasDescargas(int pags, int marcos, int &vecesCompletas, int &sobrantes){
+  int aux = pags/marcos;
+  aux += (aux-1);
+  vecesCompletas = aux;
+  sobrantes = pags % marcos;
+}
 void calcularTiempos() {
     for (auto& p : procesos) {
-        double probabilidadFallo = std::max(0.0, (double)(p.numPaginas - p.marcosAsignados) / p.numPaginas);
-        p.tiempoFallas = std::round(p.numPaginas * probabilidadFallo * (p.tiempoAcceso + p.tiempoTransferencia));
+        if(p.numPaginas < p.marcosAsignados)
+          {
+            p.tiempoFallas = p.numPaginas * (p.tiempoAcceso + p.tiempoTransferencia);
+          }
+        else{
+           int a, b;
+           CalcularCargasDescargas(p.numPaginas, p.marcosAsignados, a, b);
+           p.tiempoFallas = ((p.marcosAsignados * a) + (b*2)) * (p.tiempoAcceso + p.tiempoTransferencia);
+          }
         p.turnaroundTime = p.tiempoFallas + p.tiempoEjecucion;
-    }
+    
 }
 
 void mostrarResultados() {
