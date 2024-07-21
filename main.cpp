@@ -12,12 +12,11 @@ struct Proceso {
     std::string unidad;
     int numPaginas;
     int marcosAsignados;
-    double fragmentacionInterna;
-    int tiempoAcceso;
-    int tiempoTransferencia;
-    int tiempoEjecucion;
-    int tiempoFallas;
-    int turnaroundTime;
+    float tiempoAcceso;
+    float tiempoTransferencia;
+    float tiempoEjecucion;
+    float tiempoFallas;
+    float turnaroundTime;
 };
 
 // const int RAM_SIZE = 2 * 1024 * 1024; // 2MB en bytes
@@ -80,7 +79,6 @@ void ingresarProcesos() {
         
         double tamanoBytes = convertirABytes(p.tamano, p.unidad);
         p.numPaginas = calcularNumeroPaginas(tamanoBytes, BLOCK_SIZE);
-        p.fragmentacionInterna = (p.numPaginas * BLOCK_SIZE) - tamanoBytes;
         
         procesos.push_back(p);
     }
@@ -152,14 +150,14 @@ std::vector<std::string> split(std::string str, char pattern) {
     return results;
 }
 
-void ingresar_desde_archivo(std::vector<Proceso>& procesos, int num){
+void ingresar_desde_archivo(){
     std::ifstream read;
     read.open("procesos.txt", std::ios::out | std::ios::in);
     char ln[100];
     if(read.is_open()){ 
         procesos.resize(numProcesos);
         read.getline(ln, 100);
-        for(int i = 0; i < num; i++){
+        for(int i = 0; i < numProcesos; i++){
             read.getline(ln, 100);
             std::vector<std::string> resultado = split(ln,  '|');
             procesos[i].nombre = resultado[0];
@@ -199,7 +197,7 @@ void calcularTiempos() {
            p.tiempoFallas = ((p.marcosAsignados * a) + (b*2)) * (p.tiempoAcceso + p.tiempoTransferencia);
           }
         p.turnaroundTime = p.tiempoFallas + p.tiempoEjecucion;
-    
+    }
 }
 
 void mostrarResultados() {
@@ -238,11 +236,11 @@ int main() {
     bool tiemposCargados = false;
     do {
         std::cout << "\nMenú:" << std::endl;
-        std::cout << "1. Ingresar procesos" << std::endl;
-        std::cout << "2. Mostrar páginas y marcos por proceso" << std::endl;
-        std::cout << "3. Ingresar tiempos de acceso, transferencia y ejecución" << std::endl;
-        std::cout << "4. Calcular y mostrar resultados" << std::endl;
-        std::cout << "5. Ingresar procesos" << std::endl;
+        //std::cout << "1. Ingresar procesos" << std::endl;
+        //std::cout << "2. Mostrar páginas y marcos por proceso" << std::endl;
+        //std::cout << "3. Ingresar tiempos de acceso, transferencia y ejecución" << std::endl;
+        std::cout << "1. Ingresar procesos desde archivo" << std::endl;
+        std::cout << "2. Calcular y mostrar resultados" << std::endl;
         std::cout << "0. Salir" << std::endl;
         std::cout << "Elija una opción: ";
         std::cin >> opcion;
@@ -293,5 +291,9 @@ int main() {
         }
     } while (opcion != 0);
 
+    ingresar_desde_archivo();
+    calcularTiempos();
+    mostrarResultados();
+    std::cin;
     return 0;
 }
