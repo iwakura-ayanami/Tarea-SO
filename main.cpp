@@ -43,7 +43,7 @@ int calcularNumeroPaginas(double tamanoBytes, int tamanoBloque) {
 }
 
 void distribucionProporcional() {
-    int totalPaginas = 0;
+    float totalPaginas = 0;
     for (auto& p : procesos) {
         totalPaginas += p.numPaginas;
     }
@@ -52,7 +52,10 @@ void distribucionProporcional() {
     
     for (auto& p : procesos) {
         double proporcion = (double)p.numPaginas / totalPaginas;
-        p.marcosAsignados = std::round(proporcion * marcosDisponibles);
+        if(proporcion * marcosDisponibles < 1.0)
+            p.marcosAsignados = 1;
+        else
+            p.marcosAsignados = std::floor(proporcion * marcosDisponibles);
     }
 }
 
@@ -157,8 +160,10 @@ void ingresar_desde_archivo(){
         p.tiempoAcceso = std::stof(fila[3]);
         p.tiempoEjecucion = std::stof(fila[4]);
         p.tiempoTransferencia = std::stof(fila[5]);
+        p.numPaginas = calcularNumeroPaginas(p.tamano, BLOCK_SIZE);
+        
         procesos.push_back(p);
-     }
+    }
     read.close();
 }
 
@@ -180,7 +185,9 @@ void calcularTiempos() {
            p.tiempoFallas = ((p.marcosAsignados * a) + (b*2)) * (p.tiempoAcceso + p.tiempoTransferencia);
           }
         p.turnaroundTime = p.tiempoFallas + (p.tiempoEjecucion*p.numPaginas);
+        
     }
+    std::cout << "hola";
 }
 
 void mostrarResultados() {
@@ -215,6 +222,7 @@ void imprimir(){
 
 int main() {
     ingresar_desde_archivo();
+    distribucionProporcional();
     calcularTiempos();
     mostrarResultados();
     system("PAUSE");
