@@ -20,8 +20,8 @@ struct Proceso {
 };
 
 
-const int RAM_SIZE = 20 * 1024 * 1024; // 2MB
-const int BLOCK_SIZE = 4096; // 512B
+const int RAM_SIZE = 2 * 1024 * 1024; // 2MB
+const int BLOCK_SIZE = 512; // 512B
 const int MAX_PROCESOS = 6;
 
 std::vector<Proceso> procesos; //Vector de procesos a analizar.
@@ -165,17 +165,15 @@ void mostrarResultados() {
     std::cout << "\nResultados:" << std::endl;
     std::cout << std::left << std::setw(10) << "Proceso" 
               << std::setw(20) << "Tiempo de Fallas (ms)" 
-              << std::setw(20) << "Turn around Time(ms)"
-              << std::setw(20) << "paginas "                //Imprime el header
-              << std::setw(20) << "marcos" << std::endl;
+              << std::setw(20) << "Turn around Time(ms)"<< std::endl;
+              
     std::cout << std::string(50, '-') << std::endl;
 
     for (const auto& p : procesos) {
         std::cout << std::left << std::setw(10) << p.nombre 
                   << std::setw(20) << p.tiempoFallas        //Imprime cada uno de los procesos
-                  << std::setw(20) << p.turnaroundTime
-                  << std::setw(20) <<p.numPaginas 
-                  << std::setw(20) <<p.marcosAsignados << std::endl;
+                  << std::setw(20) << p.turnaroundTime<< std::endl;
+                  
     }
 }
 
