@@ -1,7 +1,4 @@
 #nombre, tamaño, Unidad de Medida, tiempo de acceso, tiempo de tranferencia, tiempo de ejecución
-p1,450166,B,8,12
-p2,1000,K,1000,1000,1000
-p3,1000,K,1000,1000,1000
-p4,1000,K,1000,1000,1000
-p5,1000,K,1000,1000,1000
-p6,1000,K,1000,1000,1000
+p1,3601333,b,8,12,30
+p2,2304000,B,8,12,30
+p3,256000,B,8,12,30
