@@ -5,6 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <iomanip>
+using namespace std;
 
 struct Proceso {
     std::string nombre;
@@ -158,8 +159,11 @@ void ingresar_desde_archivo(){
         double tamano = std::stod(fila[1]);
         p.tamano = convertirABytes(tamano, p.unidad);
         p.tiempoAcceso = std::stof(fila[3]);
-        p.tiempoEjecucion = std::stof(fila[4]);
-        p.tiempoTransferencia = std::stof(fila[5]);
+        p.tiempoEjecucion = std::stof(fila[5]);
+        p.tiempoTransferencia = std::stof(fila[4]);
+        //cout<<p.tiempoTransferencia<<endl;
+        //cout<<p.tiempoAcceso<<endl;
+        //cout<<p.tiempoEjecucion<<endl;
         p.numPaginas = calcularNumeroPaginas(p.tamano, BLOCK_SIZE);
         
         procesos.push_back(p);
@@ -182,7 +186,13 @@ void calcularTiempos() {
         else{
            int a, b;
            CalcularCargasDescargas(p.numPaginas, p.marcosAsignados, a, b);
-           p.tiempoFallas = ((p.marcosAsignados * a) + (b*2)) * (p.tiempoAcceso + p.tiempoTransferencia);
+           cout<<a<<"  "<<b<<endl;
+           cout<<p.tiempoTransferencia<<" "<<p.tiempoAcceso<<endl;
+
+           p.tiempoFallas = p.marcosAsignados * a;
+           p.tiempoFallas += b*2;
+           p.tiempoFallas *= (p.tiempoAcceso + p.tiempoTransferencia);
+           
           }
         p.turnaroundTime = p.tiempoFallas + (p.tiempoEjecucion*p.numPaginas);
         
@@ -194,13 +204,17 @@ void mostrarResultados() {
     std::cout << "\nResultados:" << std::endl;
     std::cout << std::left << std::setw(10) << "Proceso" 
               << std::setw(20) << "Tiempo de Fallas (ms)" 
-              << std::setw(20) << "Turnaround Time (ms)" << std::endl;
+              << std::setw(20) << "Turn around Time(ms)"
+              << std::setw(20) << "paginas " 
+              << std::setw(20) << "marcos" << std::endl;
     std::cout << std::string(50, '-') << std::endl;
 
     for (const auto& p : procesos) {
         std::cout << std::left << std::setw(10) << p.nombre 
                   << std::setw(20) << p.tiempoFallas 
-                  << std::setw(20) << p.turnaroundTime << std::endl;
+                  << std::setw(20) << p.turnaroundTime
+                  << std::setw(20) <<p.numPaginas 
+                  << std::setw(20) <<p.marcosAsignados << std::endl;
     }
 }
 
