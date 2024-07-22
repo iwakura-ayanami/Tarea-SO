@@ -18,6 +18,7 @@ struct Proceso {
     float tiempoFallas;
     float turnaroundTime;
 };
+void imprimir();
 
 // const int RAM_SIZE = 2 * 1024 * 1024; // 2MB en bytes
 const int RAM_SIZE = 20 * 1024 * 1024; // 2MB en bytes
@@ -102,10 +103,8 @@ void mostrarPaginasYMarcos() {
     for (const auto& p : procesos) {
         std::cout << std::left << std::setw(10) << p.nombre 
                   << std::setw(20) << p.numPaginas 
-                  << std::setw(20) << p.marcosAsignados
-                  << std::setw(25) << std::fixed << std::setprecision(2) << p.fragmentacionInterna << std::endl;
+                  << std::setw(20) << p.marcosAsignados << std::endl;
         totalPaginas += p.numPaginas;
-        fragmentacionInternaTotal += p.fragmentacionInterna;
         marcosTotalesAsignados += p.marcosAsignados;
     }
 
@@ -133,49 +132,33 @@ void ingresarTiempos() {
     }
 }
 
-std::vector<std::string> split(std::string str, char pattern) {
-    
-    int posInit = 0;
-    int posFound = 0;
-    std::string splitted;
-    std::vector<std::string> results;
-    
-    while(posFound >= 0){
-        posFound = str.find(pattern, posInit);
-        splitted = str.substr(posInit, posFound - posInit);
-        posInit = posFound + 1;
-        results.push_back(splitted);
-    }
-    
-    return results;
-}
 
 void ingresar_desde_archivo(){
     std::ifstream read;
-    read.open("procesos.txt", std::ios::out | std::ios::in);
-    char ln[100];
-    if(read.is_open()){ 
-        procesos.resize(numProcesos);
-        read.getline(ln, 100);
-        for(int i = 0; i < numProcesos; i++){
-            read.getline(ln, 100);
-            std::vector<std::string> resultado = split(ln,  '|');
-            procesos[i].nombre = resultado[0];
-            std::cout << procesos[i].nombre;
-
-            std::string unidad = "";
-            unidad += resultado[2][0];
-            procesos[i].unidad = unidad;
-            unsigned long tamano = std::stoi(resultado[1]);
-            procesos[i].tamano = convertirABytes(tamano, unidad);
-            procesos[i].tiempoAcceso = std::stoi(resultado[3]);
-            procesos[i].tiempoEjecucion = std::stoi(resultado[4]);
-            procesos[i].tiempoTransferencia = std::stoi(resultado[5]);
+    read.open("procesos.csv", std::ios::in);
+    std::string line, word;
+    Proceso p;
+    getline(read, line);
+    std::vector<std::string> fila;
+     while(read.is_open()){
+        fila.clear();
+        getline(read, line);
+        std::stringstream s(line);
+        if(line == "")break;
+        while (getline(s, word, ',')) {
+            fila.push_back(word);
         }
-    }
-    else{
-        std::cout << "¡Error! El archivo no pudo ser abierto." << std::endl;
-    }
+        fila.push_back(word);
+
+        p.nombre = fila[0];
+        p.unidad = fila[2];
+        double tamano = std::stod(fila[1]);
+        p.tamano = convertirABytes(tamano, p.unidad);
+        p.tiempoAcceso = std::stof(fila[3]);
+        p.tiempoEjecucion = std::stof(fila[4]);
+        p.tiempoTransferencia = std::stof(fila[5]);
+        procesos.push_back(p);
+     }
     read.close();
 }
 
@@ -231,69 +214,9 @@ void imprimir(){
 }
 
 int main() {
-    int opcion;
-    bool procesosCargados = false;
-    bool tiemposCargados = false;
-    do {
-        std::cout << "\nMenú:" << std::endl;
-        //std::cout << "1. Ingresar procesos" << std::endl;
-        //std::cout << "2. Mostrar páginas y marcos por proceso" << std::endl;
-        //std::cout << "3. Ingresar tiempos de acceso, transferencia y ejecución" << std::endl;
-        std::cout << "1. Ingresar procesos desde archivo" << std::endl;
-        std::cout << "2. Calcular y mostrar resultados" << std::endl;
-        std::cout << "0. Salir" << std::endl;
-        std::cout << "Elija una opción: ";
-        std::cin >> opcion;
-
-        limpiarBuffer();
-
-        switch(opcion) {
-            case 1:
-                ingresarProcesos();
-                procesosCargados = true;
-                tiemposCargados = false;  // Reiniciar si se ingresan nuevos procesos
-                break;
-            case 2:
-                if (!procesosCargados) {
-                    std::cout << "Primero debe ingresar los procesos." << std::endl;
-                } else {
-                    mostrarPaginasYMarcos();
-                }
-                break;
-            case 3:
-                if (!procesosCargados) {
-                    std::cout << "Primero debe ingresar los procesos." << std::endl;
-                } else {
-                    ingresarTiempos();
-                    tiemposCargados = true;
-                }
-                break;
-            case 4:
-                if (!procesosCargados || !tiemposCargados) {
-                    std::cout << "Debe ingresar los procesos y los tiempos primero." << std::endl;
-                } else {
-                    calcularTiempos();
-                    mostrarResultados();
-                }
-                break;
-            case 5:
-                ingresar_desde_archivo(procesos, numProcesos);
-                procesosCargados = true;
-                tiemposCargados = false;
-                std::cout << "Leyendo archivo..." << std::endl;
-                imprimir();
-                break;
-            case 0:
-                std::cout << "Saliendo del programa..." << std::endl;
-                break;
-            default:   
-                std::cout << "Opción no válida. Intente de nuevo." << std::endl;
-        }
-    } while (opcion != 0);
-
     ingresar_desde_archivo();
     calcularTiempos();
     mostrarResultados();
-    std::cin;
+    system("PAUSE");
     return 0;
 }
